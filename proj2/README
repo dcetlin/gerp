@@ -1,0 +1,149 @@
+/********************
+* Daniel Cetlin
+* dcetli01
+* 20 April 2017
+* PROJ2
+* README
+*********************/
+
+1. Title: PROJ2 — GERP
+
+2. Purpose:
+
+3. Files:
+   gerp.cpp
+   > contains main function to run gerp.
+
+   GerpSimulation.h GerpSimulation.cpp
+   > The simulation object that uses LinesOfCode WordHashTemplate
+     and Parcer objects to run the gerp program.
+
+   LinesOfCode.h LinesOfCode.cpp
+   > Iterates through a directory's subdirectories and all files it 
+     comes across and stores every line of code with at least one alpha
+     numeric character. It sends each line and the index it is stored 
+     in to a parcer object to create hash tables for the words in the 
+     lines. Can access the lines given an index.
+
+   Parcer.cpp Parcer.h
+   > Object parces a single line of code and hashes each word
+     to the indexes of the line. It also hashes each lower case version
+     of the word to the origional version. It also will fetch the 
+     list of indexes given a word.
+
+   stringProcessing.cpp stringProcessing.h
+   > Has a function that strips all strings of their outer non-alpha 
+     numeric characters.
+
+   WordHashTemplate.h
+   > Template object that hashes strings to either an unordered set of 
+   strings or an unordered set of integers. It takes care of collisions
+   using linked list nodes
+
+   testLinesOfCode.cpp
+   > tests the LinesOfCode object
+
+   testWordHashTemplate.cpp
+   > tests the WordHash object
+
+4. How to compile: make
+   
+   How to run:
+      gerp: ./gerp [directory]
+      testWordHashTemplate: ./testWordHashTemplate 
+      testLinesOfCode: ./testLinesOfCode [directory]
+
+5. Archetectural Overview / Data structures and Algorithms:
+   
+   WordHashTemplate Object:
+
+   This object hashes string keys to list-of-strings values and
+   strings keys to list-of-int values. It uses the built in hash
+   function to get an index and place each key/value pair into 
+   a dynamically allocated sequence. The object is made out of 
+   a sequence of LinkNodes, where each LinkNode includes a key
+   a list of values, and a pointer to another LinkNode. This is beacuse
+   this hash table object uses linked lists to account for collisions.
+   The lists that contain the ints and strings in the values are 
+   unordered_sets so that there cannot be duplicate indexes/strings. 
+   Despite the values being unorderd_sets, the object's insert function
+   accepts keys and either single ints or strings. It adds the single 
+   ints/strings to the unordered_set related to the given key if the key
+   already exists in the set. Otherwise it makes a new Node if the key does
+   not exist yet. A client using this object can get the unordered_set at a
+   given node if it exists.
+
+   Parcer Object:
+
+   This object parces through strings containing multiple words and hashes 
+   each word to its index. It also hashes the lowercase version of each word
+   to the origional word (after non-alphanumeric characters are truncated
+   from the beginning and end of the word). Doing this allows the object to 
+   easily access indexes of case insensitive searches. For this, it finds
+   the list of word variants hashed to the word key. It then find the list
+   of indexes for every word variant key in the hash table. Then it compiles
+   an unordered set (no repetition) of all indexes containing a word. For 
+   case sensitive searches, it only finds the list of indexes for the single
+   case-sensitive word.
+   
+   LinesOfCode Object:
+
+   This object uses the FSTree and DirNode classes to create a tree of all
+   files and subdirectories contained in a directory. It iterates through
+   the tree, creating strings in the format "path:line#: (line of code)".
+   It does this through a recursive algorithm that keeps track of the path
+   of a file. When it gets to a file, it iterates through every line of code
+   and if a line contains at least 1 alphanumeric character, it creates 
+   string in the format mentioned above for the line and places the complete
+   string in a vector of strings. It then utilizes a Parcer object and
+   provides each line of code along with its corresponding index in the 
+   vector. In doing so, each word parced will be hashed to all of its
+   indexes in the vector. In order to search the lines of code for a word,
+   the LinesOfCode object gets the word's list of indexes from the parcer
+   object and compiles a list of all strings at the given indexes.
+
+   Efficiency, space, searchability:
+
+   For any (nonempty) directory, the code will create a sequence that is 
+   the size of the number of different words found. It will also create 
+   another sequence the size of the number of case insensitive word
+   variations. Each of these sequences has a linked list that may contain
+   any number of unorderd sets. The code also creates a list of all lines
+   of code found. I chose this approach because I thought it would be 
+   very easy to access content and not require too much data usage.
+   Indexing made it efficient because I would not have to store each 
+   line of code multiple times.
+
+   Searching is very fast. In O(1) time (assuming the linked list is 
+   size 1 or small), it gets the indexes for a word. Since each word
+   most likely has few case insensitive invariants, even the @i search
+   should be O(1). Converting each index to strings should take O(n) where
+   n is the number of indexes corresponding to that word. This is because
+   accessing the string with the index is constant time. For the sake of
+   modularity, the printing is not done when accessing each string, instead
+   the list of strings is sent to the simulation object to be printed in
+   O(n) time. I understand that this last O(n) step could be avoided but the
+   compiled lists of strings containing words are often small enough where 
+   the added step is marginal in terms of time.
+
+7. Testing:
+    For testing, I have two main test files.
+
+    The testWordHashTemplate.cpp
+    file tests the WordHash object. It tests its ability to resize,
+    it tests that it can has both strings to lists of strings as well as
+    strings to lists of ints. It then prints the entire hashtable noting the
+    total number of elements as well as the total number of elements printed.
+    It prints each linked list in the table. It also check that the hash table
+    can recieve a value given a key in its own linked list, in the middle,
+    at the beginning, or at the end of the linked list. It also checks to see
+    that it can tell a key does not exist.
+
+    TestLinesOfCode.cpp makes sure that it can use the trees properly and print
+    an entire list of code from a directory. 
+
+    General testing includes using the tinyData directory to make sure that
+    it prints the lines of every single word in the file.
+
+    I created this program piece by piece, testing along the way, so when I
+    finally put everything together, there was minimal debugging
