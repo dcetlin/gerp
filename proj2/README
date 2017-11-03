@@ -14,18 +14,18 @@
    gerp.cpp
    > contains main function to run gerp.
 
-   GerpSimulation.h GerpSimulation.cpp
+   GerpSimulation.h GerpSimulation.cpp (Notable File)
    > The simulation object that uses LinesOfCode WordHashTemplate
      and Parcer objects to run the gerp program.
 
-   LinesOfCode.h LinesOfCode.cpp
+   LinesOfCode.h LinesOfCode.cpp (Notable File)
    > Iterates through a directory's subdirectories and all files it 
      comes across and stores every line of code with at least one alpha
      numeric character. It sends each line and the index it is stored 
      in to a parcer object to create hash tables for the words in the 
      lines. Can access the lines given an index.
 
-   Parcer.cpp Parcer.h
+   Parcer.cpp Parcer.h (Notable File)
    > Object parces a single line of code and hashes each word
      to the indexes of the line. It also hashes each lower case version
      of the word to the origional version. It also will fetch the 
@@ -35,7 +35,7 @@
    > Has a function that strips all strings of their outer non-alpha 
      numeric characters.
 
-   WordHashTemplate.h
+   WordHashTemplate.h (Notable File)
    > Template object that hashes strings to either an unordered set of 
    strings or an unordered set of integers. It takes care of collisions
    using linked list nodes
